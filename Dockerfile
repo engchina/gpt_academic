@@ -9,12 +9,26 @@ RUN echo '[global]' > /etc/pip.conf && \
 
 
 WORKDIR /gpt
+<<<<<<< HEAD
 COPY requirements.txt .
 RUN pip3 install -r requirements.txt
 
 COPY . .
+=======
+
+# 装载项目文件
+COPY . .
+
+# 安装依赖
+RUN pip3 install -r requirements.txt
+
+>>>>>>> upstream/master
 
 # 可选步骤，用于预热模块
 RUN python3  -c 'from check_proxy import warm_up_modules; warm_up_modules()'
 
+<<<<<<< HEAD
+=======
+# 启动
+>>>>>>> upstream/master
 CMD ["python3", "-u", "main.py"]

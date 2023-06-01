@@ -34,6 +34,7 @@ def print亮紫(*kw,**kargs):
 def print亮靛(*kw,**kargs):
     print("\033[1;36m",*kw,"\033[0m",**kargs)
 
+<<<<<<< HEAD
 
 
 def print亮红(*kw,**kargs):
@@ -89,3 +90,30 @@ if not stdout.isatty():
     print_bold_blue = print
     print_bold_purple = print
     print_bold_indigo = print
+=======
+# Do you like the elegance of Chinese characters?
+def sprint红(*kw):
+    return "\033[0;31m"+' '.join(kw)+"\033[0m"
+def sprint绿(*kw):
+    return "\033[0;32m"+' '.join(kw)+"\033[0m"
+def sprint黄(*kw):
+    return "\033[0;33m"+' '.join(kw)+"\033[0m"
+def sprint蓝(*kw):
+    return "\033[0;34m"+' '.join(kw)+"\033[0m"
+def sprint紫(*kw):
+    return "\033[0;35m"+' '.join(kw)+"\033[0m"
+def sprint靛(*kw):
+    return "\033[0;36m"+' '.join(kw)+"\033[0m"
+def sprint亮红(*kw):
+    return "\033[1;31m"+' '.join(kw)+"\033[0m"
+def sprint亮绿(*kw):
+    return "\033[1;32m"+' '.join(kw)+"\033[0m"
+def sprint亮黄(*kw):
+    return "\033[1;33m"+' '.join(kw)+"\033[0m"
+def sprint亮蓝(*kw):
+    return "\033[1;34m"+' '.join(kw)+"\033[0m"
+def sprint亮紫(*kw):
+    return "\033[1;35m"+' '.join(kw)+"\033[0m"
+def sprint亮靛(*kw):
+    return "\033[1;36m"+' '.join(kw)+"\033[0m"
+>>>>>>> upstream/master

@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 from toolbox import update_ui
+=======
+from toolbox import update_ui, trimmed_format_exc, gen_time_str
+>>>>>>> upstream/master
 from toolbox import CatchException, report_execption, write_results_to_file
 fast_debug = False
 
@@ -32,9 +36,27 @@ class PaperFileGroup():
                     self.sp_file_contents.append(segment)
                     self.sp_file_index.append(index)
                     self.sp_file_tag.append(self.file_paths[index] + f".part-{j}.md")
+<<<<<<< HEAD
 
         print('Segmentation: done')
 
+=======
+        print('Segmentation: done')
+
+    def merge_result(self):
+        self.file_result = ["" for _ in range(len(self.file_paths))]
+        for r, k in zip(self.sp_file_result, self.sp_file_index):
+            self.file_result[k] += r
+
+    def write_result(self, language):
+        manifest = []
+        for path, res in zip(self.file_paths, self.file_result):
+            with open(path + f'.{gen_time_str()}.{language}.md', 'w', encoding='utf8') as f:
+                manifest.append(path + f'.{gen_time_str()}.{language}.md')
+                f.write(res)
+        return manifest
+
+>>>>>>> upstream/master
 def 多文件翻译(file_manifest, project_folder, llm_kwargs, plugin_kwargs, chatbot, history, system_prompt, language='en'):
     import time, os, re
     from .crazy_utils import request_gpt_model_multi_threads_with_very_awesome_ui_and_high_efficiency
@@ -53,7 +75,11 @@ def 多文件翻译(file_manifest, project_folder, llm_kwargs, plugin_kwargs, ch
     pfg.run_file_split(max_token_limit=1500)
     n_split = len(pfg.sp_file_contents)
 
+<<<<<<< HEAD
     #  <-------- 多线程润色开始 ----------> 
+=======
+    #  <-------- 多线程翻译开始 ----------> 
+>>>>>>> upstream/master
     if language == 'en->zh':
         inputs_array = ["This is a Markdown file, translate it into Chinese, do not modify any existing Markdown commands:" + 
                         f"\n\n{frag}" for frag in pfg.sp_file_contents]
@@ -64,6 +90,14 @@ def 多文件翻译(file_manifest, project_folder, llm_kwargs, plugin_kwargs, ch
                         f"\n\n{frag}" for frag in pfg.sp_file_contents]
         inputs_show_user_array = [f"翻译 {f}" for f in pfg.sp_file_tag]
         sys_prompt_array = ["You are a professional academic paper translator." for _ in range(n_split)]
+<<<<<<< HEAD
+=======
+    else:
+        inputs_array = [f"This is a Markdown file, translate it into {language}, do not modify any existing Markdown commands, only answer me with translated results:" + 
+                        f"\n\n{frag}" for frag in pfg.sp_file_contents]
+        inputs_show_user_array = [f"翻译 {f}" for f in pfg.sp_file_tag]
+        sys_prompt_array = ["You are a professional academic paper translator." for _ in range(n_split)]
+>>>>>>> upstream/master
 
     gpt_response_collection = yield from request_gpt_model_multi_threads_with_very_awesome_ui_and_high_efficiency(
         inputs_array=inputs_array,
@@ -75,6 +109,17 @@ def 多文件翻译(file_manifest, project_folder, llm_kwargs, plugin_kwargs, ch
         # max_workers=5,  # OpenAI所允许的最大并行过载
         scroller_max_len = 80
     )
+<<<<<<< HEAD
+=======
+    try:
+        pfg.sp_file_result = []
+        for i_say, gpt_say in zip(gpt_response_collection[0::2], gpt_response_collection[1::2]):
+            pfg.sp_file_result.append(gpt_say)
+        pfg.merge_result()
+        pfg.write_result(language)
+    except:
+        print(trimmed_format_exc())
+>>>>>>> upstream/master
 
     #  <-------- 整理结果，退出 ----------> 
     create_report_file_name = time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime()) + f"-chatgpt.polish.md"
@@ -183,4 +228,44 @@ def Markdown中译英(txt, llm_kwargs, plugin_kwargs, chatbot, history, system_p
         report_execption(chatbot, history, a = f"解析项目: {txt}", b = f"找不到任何.md文件: {txt}")
         yield from update_ui(chatbot=chatbot, history=history) # 刷新界面
         return
+<<<<<<< HEAD
     yield from 多文件翻译(file_manifest, project_folder, llm_kwargs, plugin_kwargs, chatbot, history, system_prompt, language='zh->en')
+=======
+    yield from 多文件翻译(file_manifest, project_folder, llm_kwargs, plugin_kwargs, chatbot, history, system_prompt, language='zh->en')
+
+
+@CatchException
+def Markdown翻译指定语言(txt, llm_kwargs, plugin_kwargs, chatbot, history, system_prompt, web_port):
+    # 基本信息：功能、贡献者
+    chatbot.append([
+        "函数插件功能？",
+        "对整个Markdown项目进行翻译。函数插件贡献者: Binary-Husky"])
+    yield from update_ui(chatbot=chatbot, history=history) # 刷新界面
+
+    # 尝试导入依赖，如果缺少依赖，则给出安装建议
+    try:
+        import tiktoken
+        import glob, os
+    except:
+        report_execption(chatbot, history,
+                         a=f"解析项目: {txt}",
+                         b=f"导入软件依赖失败。使用该模块需要额外依赖，安装方法```pip install --upgrade tiktoken```。")
+        yield from update_ui(chatbot=chatbot, history=history) # 刷新界面
+        return
+    history = []    # 清空历史，以免输入溢出
+    success, file_manifest, project_folder = get_files_from_everything(txt)
+    if not success:
+        # 什么都没有
+        if txt == "": txt = '空空如也的输入栏'
+        report_execption(chatbot, history, a = f"解析项目: {txt}", b = f"找不到本地项目或无权访问: {txt}")
+        yield from update_ui(chatbot=chatbot, history=history) # 刷新界面
+        return
+    if len(file_manifest) == 0:
+        report_execption(chatbot, history, a = f"解析项目: {txt}", b = f"找不到任何.md文件: {txt}")
+        yield from update_ui(chatbot=chatbot, history=history) # 刷新界面
+        return
+    
+    if ("advanced_arg" in plugin_kwargs) and (plugin_kwargs["advanced_arg"] == ""): plugin_kwargs.pop("advanced_arg")
+    language = plugin_kwargs.get("advanced_arg", 'Chinese')
+    yield from 多文件翻译(file_manifest, project_folder, llm_kwargs, plugin_kwargs, chatbot, history, system_prompt, language=language)
+>>>>>>> upstream/master
